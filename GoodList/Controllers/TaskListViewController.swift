@@ -25,17 +25,19 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
         self.navigationController?.navigationBar.prefersLargeTitles = true
     }
     
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 10
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return filteredTasks.count
     }
+    
+    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath)
+        print(filteredTasks)
+        cell.textLabel?.text = filteredTasks[indexPath.row].title
         return cell
     }
     
@@ -65,9 +67,17 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
         filterTasks(by: priority)
     }
     
+    private func updateTableView(){
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {return}
+            self.tableView.reloadData()
+        }
+    }
+    
     private func filterTasks(by priority: Priority?){
         if priority == nil {
             filteredTasks = tasks.value
+            updateTableView()
         } else {
             self.tasks.map { (tasks) in
                 return tasks.filter { $0.priority == priority!}
@@ -75,7 +85,7 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
             }.subscribe(onNext: { [weak self] tasks in
                 guard let self = self else {return}
                 self.filteredTasks = tasks
-                print(tasks)
+                self.updateTableView()
             }).disposed(by: disposeBag)
         }
     }
