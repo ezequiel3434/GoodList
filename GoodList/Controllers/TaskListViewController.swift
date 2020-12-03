@@ -18,6 +18,7 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
     
     let disposeBag = DisposeBag()
     private var tasks = BehaviorRelay<[Task]>(value: [])
+    private var filteredTasks = [Task]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +54,30 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
                 var value = self.tasks.value
                 value.append(task)
                 self.tasks.accept(value)
+                
+                self.filterTasks(by: priority)
+                
             }).disposed(by: disposeBag)
+    }
+    
+    @IBAction func priorityValueChanged(segmentedControl: UISegmentedControl){
+        let priority = Priority(rawValue: segmentedControl.selectedSegmentIndex - 1)
+        filterTasks(by: priority)
+    }
+    
+    private func filterTasks(by priority: Priority?){
+        if priority == nil {
+            filteredTasks = tasks.value
+        } else {
+            self.tasks.map { (tasks) in
+                return tasks.filter { $0.priority == priority!}
+                
+            }.subscribe(onNext: { [weak self] tasks in
+                guard let self = self else {return}
+                self.filteredTasks = tasks
+                print(tasks)
+            }).disposed(by: disposeBag)
+        }
     }
     
 }
