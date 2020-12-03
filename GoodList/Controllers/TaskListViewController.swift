@@ -5,14 +5,19 @@
 //  Created by Ezequiel Parada Beltran on 03/12/2020.
 //
 
+import Foundation
 import UIKit
 import RxSwift
+import RxCocoa
 
 class TaskListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    private let disposeBag = DisposeBag()
+    
     @IBOutlet weak var proritySegmentedControl: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
+    
+    let disposeBag = DisposeBag()
+    private var tasks = BehaviorRelay<[Task]>(value: [])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,8 +45,14 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
         }
         
         addTVC.taskSubjectObservable
-            .subscribe(onNext: { task in
-                print(task)
+            .subscribe(onNext: { [weak self] task in
+                guard let self = self else { return}
+                
+                let priority = Priority(rawValue: self.proritySegmentedControl.selectedSegmentIndex - 1)
+                
+                var value = self.tasks.value
+                value.append(task)
+                self.tasks.accept(value)
             }).disposed(by: disposeBag)
     }
     
