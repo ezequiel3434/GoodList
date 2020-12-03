@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import RxSwift
 
 class TaskListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    private let disposeBag = DisposeBag()
     @IBOutlet weak var proritySegmentedControl: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
     
@@ -29,6 +31,18 @@ class TaskListViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskTableViewCell", for: indexPath)
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let navC = segue.destination as? UINavigationController,
+              let addTVC = navC.viewControllers.first as? AddTaskViewController else {
+            fatalError("Controller not found...")
+        }
+        
+        addTVC.taskSubjectObservable
+            .subscribe(onNext: { task in
+                print(task)
+            }).disposed(by: disposeBag)
     }
     
 }
