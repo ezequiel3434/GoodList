@@ -107,8 +107,16 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Add Task" id="vvm-mE-F1n">
-                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="zPo-S2-WYi"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="zPo-S2-WYi">
+                            <connections>
+                                <action selector="save" destination="pPX-zo-K72" id="XU8-Rp-lOe"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="prioritySegmentedControl" destination="u0Y-zK-rhs" id="WF8-8V-zTO"/>
+                        <outlet property="taskTitleTextField" destination="CSK-0B-od0" id="P8T-Fh-t8I"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JUG-NI-Sfe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
